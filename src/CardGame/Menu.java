@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * Menu.java - A class that represents the menu of the HighSumCardGame.
  *
- * @version 1.10 - 28 Sept 2023
+ * @version 1.10 - 30 Sept 2023
  * @author Muhammad Ashhub Ali
  * @author Adeel Ahmed
  * @author Ahmad Zafar
@@ -37,6 +37,7 @@ class Menu {
 
   /**
    * Displays all the possible options of the menu to the user.
+   * @exception IOException if an input or output exception occurrs
    */
   public void newGamePrompt() {
     while (true) {
@@ -67,31 +68,38 @@ class Menu {
    */
   public void displayResults() {
     DisplayBorder();
-    System.out.println(" Game Ends -Dealer reveals cards.");
+    System.out.println(" Game Ends - Dealer reveals cards.");
     DisplayBorder();
     highSum.viewDealerCardsEnd();
     System.out.println();
     highSum.viewUserCards();
     System.out.println();
+
     // check the winner
     if (
       highSum.calcValue(highSum.playerCards) ==
       highSum.calcValue(highSum.dealerCards)
     ) {
       System.out.println("Draw!");
-      System.out.println("Original bet returned to both dealer and IcePeak.");
+      System.out.println(
+        "Original bet returned to both dealer and " +
+        this.highSum.playerName +
+        "."
+      );
       highSum.playerChips = STARTING_COINS;
       highSum.dealerChips = STARTING_COINS;
     } else if (
       highSum.calcValue(highSum.playerCards) >
       highSum.calcValue(highSum.dealerCards)
     ) {
-      System.out.println("You Win!");
-      highSum.playerChips += highSum.total_bet;
-      System.out.println("You have " + highSum.playerChips + " chips.");
+      System.out.println(this.highSum.playerName + " Wins!");
+      highSum.playerChips += highSum.totalBet;
+      System.out.println(
+        this.highSum.playerName + " has " + highSum.playerChips + " chips."
+      );
     } else {
       System.out.println("Dealer Wins!");
-      highSum.dealerChips += highSum.total_bet;
+      highSum.dealerChips += highSum.totalBet;
       System.out.println("The dealer has " + highSum.dealerChips + " chips.");
     }
 
@@ -107,16 +115,14 @@ class Menu {
     DisplayBorder();
     System.out.println("HighSum GAME");
     DisplayBorder();
-    System.out.println(
-      highSum.username + ", You have " + highSum.playerChips + " chips."
-    );
+    System.out.println("You have " + highSum.playerChips + " chips.");
     DisplayBorder();
     System.out.println("Game Starts - Dealer shuffles deck.");
     highSum.cardDeck.shuffleDeck();
 
     for (int i = 0; i < 4; i++) {
       highSum.runRound(i + 1);
-      if (highSum.is_game_cancelled) {
+      if (highSum.isGameCancelled) {
         System.out.println("Game Cancelled!");
         this.exit = true;
         break;
@@ -130,20 +136,21 @@ class Menu {
   /**
    * Initializes the start of a new game , by creating a new instance of
    * HighSumCardGame
+   * @see #newGame()
    */
   public void Starter() {
-    this.highSum = new HighSumCardGame();
+    System.out.println("HighSum GAME");
+    DisplayBorder();
 
     while (true) {
-      System.out.println("HighSum GAME");
-      DisplayBorder();
+      System.out.println("Enter your name: ");
       try {
-        highSum.login();
-      } catch (IOException e) {
+        highSum.playerName = highSum.bf.readLine();
+        break;
+      } catch (Exception e) {
         System.out.println("Invalid Input! Please try again...");
         continue;
       }
-      break;
     }
 
     this.newGame();

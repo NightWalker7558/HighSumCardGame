@@ -7,19 +7,27 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Random;
 
-// Purpose: HighSumCardGame class that allows the user to play a game of High Sum.
-
+/**
+ * HighSumCardGame.java - A class that allows the user to play a game of High Sum.
+ *
+ * @version 1.10 - 1 Oct 2023
+ * @author Muhammad Ashhub Ali
+ * @author Adeel Ahmed
+ * @author Ahmad Zafar
+ */
 public class HighSumCardGame {
 
-  // Instance Variables
   BufferedReader bf;
   ArrayList<String> dealerCards;
   ArrayList<String> playerCards;
   CardDeck cardDeck;
-  String username, password;
+  String playerName;
   int playerChips, dealerChips;
-  int total_bet, player_bet, dealer_bet;
-  Boolean is_game_cancelled;
+  int totalBet, playerBet, dealerBet;
+  Boolean isGameCancelled;
+
+  final int MIN_BET_FOR_DEALER = 10;
+  final int MAX_BET_FOR_DEALER = 30;
 
   // Constructor
   public HighSumCardGame() {
@@ -27,36 +35,27 @@ public class HighSumCardGame {
     this.dealerCards = new ArrayList<>();
     this.playerCards = new ArrayList<>();
     this.cardDeck = new CardDeck();
-    this.username = "IcePeak";
-    this.password = "password";
     this.playerChips = this.dealerChips = 100;
-    this.total_bet = this.player_bet = this.dealer_bet = 0;
-    this.is_game_cancelled = false;
+    this.totalBet = this.playerBet = this.dealerBet = 0;
+    this.isGameCancelled = false;
+    this.playerName = "Player";
   }
 
-  // Methods
-
-  // Purpose: Method that authenticates the user.
-  // the username must be "IcePeak" and the password must be "password".
-  public void login() throws IOException {
-    System.out.print("Enter Login Name> ");
-    String name = this.bf.readLine();
-    System.out.print("Enter Password> ");
-    String pass = this.bf.readLine();
-
-    if (!name.equals(this.username) || !pass.equals(this.password)) {
-      System.out.println("Invalid Username or Password! Please try again...");
-      this.login();
-    }
-  }
-
-  // Purpose: Method that allows the passing of cards to the player and dealer.
+  /**
+   * Allows to pass the cards to the player and dealer decks.
+   * @see CardDeck#passCard()
+   * @see ArrayList#add(Object)
+   */
   public void makePass() {
     this.playerCards.add(this.cardDeck.passCard());
     this.dealerCards.add(this.cardDeck.passCard());
   }
 
-  // Purpose: Method that returns the suit value of a card.
+  /**
+   * Returns the suit value of a card.
+   * @param suit the suit of the card
+   * @return the suit value of a card
+   */
   public int returnSuitValue(String suit) {
     return switch (suit) {
       case "Spade" -> 3;
@@ -66,7 +65,13 @@ public class HighSumCardGame {
     };
   }
 
-  // Purpose: Method that returns the card value of a card.
+  /**
+   * Returns the card value of a card.
+   * @param val the value of the card
+   * @return the card value of a card
+   * @see String#equals(Object)
+   * @see Integer#parseInt(String)
+   */
   public int returnCardValue(String val) {
     if (val.equals("Ace")) return 1; else if (
       val.equals("King") ||
@@ -78,7 +83,13 @@ public class HighSumCardGame {
     }
   }
 
-  // Purpose: Method that calculates the value of a hand.
+  /**
+   * Calculates the value at hand.
+   * @param cards the cards at hand
+   * @return the value at hand
+   * @see String#split(String)
+   * @see #returnCardValue(String)
+   */
   public int calcValue(ArrayList<String> cards) {
     int value = 0;
     for (String card : cards) {
@@ -87,9 +98,12 @@ public class HighSumCardGame {
     return value;
   }
 
-  // Purpose: Method to view the player's cards.
+  /**
+   * Display the player's cards.
+   * @see #calcValue(ArrayList)
+   */
   public void viewUserCards() {
-    System.out.println(this.username);
+    System.out.println(this.playerName);
     for (String card : this.playerCards) {
       System.out.print("<" + card + "> ");
     }
@@ -97,7 +111,10 @@ public class HighSumCardGame {
     System.out.println("Value: " + calcValue(this.playerCards));
   }
 
-  // Purpose: Method to view the dealer's cards. First card is hidden.
+  /**
+   * Display the dealer's cards. (Hides the first card)
+   * @see #calcValue(ArrayList)
+   */
   public void viewDealerCards() {
     System.out.println("Dealer");
     System.out.print("<HIDDEN CARD> ");
@@ -107,7 +124,10 @@ public class HighSumCardGame {
     System.out.println();
   }
 
-  // Purpose: Method to view the dealer's cards at the end of the game.
+  /**
+   * Display the dealer's cards. (Shows all the cards)
+   * @see #calcValue(ArrayList)
+   */
   public void viewDealerCardsEnd() {
     System.out.println("Dealer");
     for (String card : this.dealerCards) {
@@ -117,7 +137,11 @@ public class HighSumCardGame {
     System.out.println("Value: " + calcValue(this.dealerCards));
   }
 
-  // Purpose: Method that checks if the bet is valid or not.
+  /**
+   * Verifies the bet placed by the player.
+   * @param bet the bet placed by the player
+   * @see #playerCall()
+   */
   public void verifyBet(int bet) {
     if (bet > this.playerChips) {
       System.out.println(
@@ -134,15 +158,17 @@ public class HighSumCardGame {
     } else {
       this.playerChips -= bet;
       this.dealerChips -= bet;
-      this.total_bet += 2 * bet;
-      System.out.println(
-        "IcePeak you are left with:" + this.playerChips + " chips."
-      );
-      System.out.println("Bet on the Table:" + this.total_bet + " chips.");
+      this.totalBet += 2 * bet;
+      System.out.println("You are left with:" + this.playerChips + " chips.");
+      System.out.println("Bet on the Table:" + this.totalBet + " chips.");
     }
   }
 
-  // Purpose: Method that allows the player to call or quit.
+  /**
+   * Allows the player to call or quit.
+   * @exception IOException if an input or output exception occurrs
+   * @see #verifyBet(int)
+   */
   public void playerCall() {
     while (true) {
       try {
@@ -152,12 +178,12 @@ public class HighSumCardGame {
           !choice.toLowerCase(Locale.ROOT).equals("c") &&
           !choice.toLowerCase(Locale.ROOT).equals("call")
         ) {
-          dealerChips += total_bet;
+          dealerChips += totalBet;
           System.out.println("Dealer WINS!");
           System.out.println("Dealer Chips: " + dealerChips);
           System.out.println();
 
-          is_game_cancelled = true;
+          isGameCancelled = true;
           return;
         }
       } catch (Exception e) {
@@ -168,9 +194,9 @@ public class HighSumCardGame {
 
     while (true) {
       try {
-        System.out.println("Player call , Enter bet amount: ");
-        this.player_bet = Integer.parseInt(this.bf.readLine());
-        this.verifyBet(this.player_bet);
+        System.out.println(this.playerName + " calls , Enter bet amount: ");
+        this.playerBet = Integer.parseInt(this.bf.readLine());
+        this.verifyBet(this.playerBet);
       } catch (Exception e) {
         System.out.println(
           "Invalid Input! Please try again.. (Enter a positive whole number))"
@@ -181,20 +207,23 @@ public class HighSumCardGame {
     }
   }
 
-  // Purpose: Method that allows the dealer to place a random bet.
+  /**
+   * Allows the dealer to call or quit.
+   * @see #dealerCall()
+   */
   public void dealerCall() {
-    int min = 10;
-    int max = 30;
+    int min = MIN_BET_FOR_DEALER;
+    int max = MAX_BET_FOR_DEALER;
     if (this.dealerChips < 30) {
       max = this.dealerChips;
       min = 3;
     }
     Random rand = new Random();
-    int dealer_bet = rand.nextInt(max - min + 1) + min;
+    int dealerBet = rand.nextInt(max - min + 1) + min;
 
     while (true) {
       try {
-        System.out.println("Dealer call , bet amount: " + dealer_bet);
+        System.out.println("Dealer call , bet amount: " + dealerBet);
         System.out.println("Do you want to follow? (Y/N)");
         String choice = this.bf.readLine();
         if (
@@ -203,19 +232,19 @@ public class HighSumCardGame {
           choice.equals("yes") ||
           choice.equals("Yes")
         ) {
-          this.dealerChips -= dealer_bet;
-          this.playerChips -= dealer_bet;
-          this.total_bet += 2 * dealer_bet;
+          this.dealerChips -= dealerBet;
+          this.playerChips -= dealerBet;
+          this.totalBet += 2 * dealerBet;
           System.out.println(
-            "IcePeak you are left with: " + this.playerChips + " chips."
+            this.playerName + " is left with: " + this.playerChips + " chips."
           );
-          System.out.println("Bet on the Table: " + this.total_bet + " chips.");
+          System.out.println("Bet on the Table: " + this.totalBet + " chips.");
         } else {
-          this.dealerChips += this.total_bet;
+          this.dealerChips += this.totalBet;
           System.out.println("Dealer WINS!");
           System.out.println("Dealer Chips: " + this.dealerChips);
           System.out.println();
-          this.is_game_cancelled = true;
+          this.isGameCancelled = true;
         }
       } catch (Exception e) {
         System.out.println("Invalid Input! Please try again...");
@@ -225,8 +254,12 @@ public class HighSumCardGame {
     }
   }
 
-  // Purpose: Method that selects the caller based on the cards. in each round.
-
+  /**
+   * Selects the caller based on the cards in previous round.
+   * @see #returnSuitValue(String)
+   * @see #dealerCall()
+   * @see #playerCall()
+   */
   public void selectCaller(int round) {
     if (
       returnSuitValue((playerCards.get(round).split("\\W+"))[0]) >
@@ -250,7 +283,14 @@ public class HighSumCardGame {
     }
   }
 
-  // Purpose: Method that runs a round of the game.
+  /**
+   * Runs a round of the game.
+   * @param round the round of the game
+   * @see #makePass()
+   * @see #selectCaller(int)
+   * @see #viewDealerCards()
+   * @see #viewUserCards()
+   */
   public void runRound(int round) {
     System.out.println(("-").repeat(100));
     System.out.println("Dealer dealing cards - ROUND " + round);
@@ -267,13 +307,15 @@ public class HighSumCardGame {
     selectCaller(round);
   }
 
-  // Purpose: Method that resets the game.
+  /**
+   * Resets the game stats.
+   */
   public void resetGame() {
     dealerCards.clear();
     playerCards.clear();
     playerChips = dealerChips = 100;
     cardDeck.resetDeck();
-    this.total_bet = this.player_bet = this.dealer_bet = 0;
-    this.is_game_cancelled = false;
+    this.totalBet = this.playerBet = this.dealerBet = 0;
+    this.isGameCancelled = false;
   }
 }
