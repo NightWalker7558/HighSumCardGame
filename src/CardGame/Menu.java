@@ -75,7 +75,11 @@ class Menu {
     highSum.viewUserCards();
     System.out.println();
 
-    // check the winner
+    if (this.highSum.isGameCancelled) {
+      System.out.println("Game Cancelled!");
+      return;
+    }
+
     if (
       highSum.calcValue(highSum.playerCards) ==
       highSum.calcValue(highSum.dealerCards)
