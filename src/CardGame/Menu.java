@@ -67,9 +67,9 @@ class Menu {
    * Displays the stats of the Game on the Console
    */
   public void displayResults() {
-    DisplayBorder();
+    displayBorder();
     System.out.println(" Game Ends - Dealer reveals cards.");
-    DisplayBorder();
+    displayBorder();
     highSum.viewDealerCardsEnd();
     System.out.println();
     highSum.viewUserCards();
@@ -116,11 +116,11 @@ class Menu {
    */
   public void newGame() {
     this.exit = false;
-    DisplayBorder();
+    displayBorder();
     System.out.println("HighSum GAME");
-    DisplayBorder();
+    displayBorder();
     System.out.println("You have " + highSum.playerChips + " chips.");
-    DisplayBorder();
+    displayBorder();
     System.out.println("Game Starts - Dealer shuffles deck.");
     highSum.cardDeck.shuffleDeck();
 
@@ -144,7 +144,7 @@ class Menu {
    */
   public void Starter() {
     System.out.println("HighSum GAME");
-    DisplayBorder();
+    displayBorder();
 
     while (true) {
       System.out.println("Enter your name: ");
@@ -163,7 +163,7 @@ class Menu {
   /**
    * Creates the border in the Console Output
    */
-  private void DisplayBorder() {
+  private void displayBorder() {
     System.out.println(("=").repeat(COUNT));
   }
 
